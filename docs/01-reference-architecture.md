@@ -189,7 +189,7 @@ Ingestion → Processing → Storage → Analytics → Visualization
 
 ## Cross-Cutting Concerns
 
-These concerns span all four layers:
+These concerns span all four layers and are the implementation mechanisms for several architecture characteristics. The concerns below — Device Management, Monitoring & Observability, and Data Governance — directly implement the **Maintainability**, **Observability**, and **Security** characteristics respectively. For the theoretical framework that explains *why* these concerns require explicit architectural decisions, see [06-architecture-characteristics.md](06-architecture-characteristics.md).
 
 ### 1. Device Management
 - Device provisioning and registration
