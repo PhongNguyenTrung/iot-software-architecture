@@ -23,6 +23,14 @@ A manufacturing plant with 500+ sensors monitoring assembly lines, robotic arms,
                                       └────────┘
 ```
 
+### Dominant Architecture Characteristics
+| Characteristic | Requirement | Priority |
+|---|---|---|
+| **Reliability** | 99.9% data delivery; offline operation during WAN outage | Critical |
+| **Performance** | < 100ms edge response for predictive maintenance alerts | High |
+| **Maintainability** | OTA firmware updates for 500+ sensors; fleet management | High |
+| **Scalability** | Handle sensor count growth without backend re-architecture | Medium |
+
 ### Key Decisions
 | Decision | Choice | Rationale |
 |---|---|---|
@@ -50,6 +58,14 @@ City-wide traffic optimization using cameras, vehicle sensors, and traffic signa
 [Road Sensors]    → [Edge Gateway]   → [Optimization Engine]
 [Signal Controllers] ←── Commands ←── [Signal Service]
 ```
+
+### Dominant Architecture Characteristics
+| Characteristic | Requirement | Priority |
+|---|---|---|
+| **Performance** | < 100ms signal control response; real-time video analysis | Critical |
+| **Observability** | Monitor all intersection sensors and signal states | High |
+| **Security / Privacy** | Video processed locally; only metadata leaves the edge | Critical |
+| **Scalability** | City-wide expansion from pilot districts to all intersections | Medium |
 
 ### Key Decisions
 | Decision | Choice | Rationale |
@@ -82,6 +98,14 @@ Continuous patient monitoring with wearable devices in a hospital and remote pat
       ├── Alert Service (Lambda)
       └── EMR Integration (AMQP → Epic/Cerner)
 ```
+
+### Dominant Architecture Characteristics
+| Characteristic | Requirement | Priority |
+|---|---|---|
+| **Security** | HIPAA compliance; mTLS; AES-256; full audit trail | Critical |
+| **Reliability** | Patient safety — alerts must never be lost; 99.99% availability | Critical |
+| **Observability** | Continuous vital sign monitoring; anomaly detection for emergency response | Critical |
+| **Interoperability** | Integration with EMR systems (Epic/Cerner) via HL7 FHIR | High |
 
 ### Key Decisions
 | Decision | Choice | Rationale |
