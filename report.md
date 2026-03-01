@@ -350,7 +350,7 @@ Trong thực tế, không thể tối ưu tất cả đặc tính đồng thời
 
 ## 4. Kiến trúc tham chiếu IoT 4 lớp
 
-### 3.1 Tổng quan mô hình
+### 4.1 Tổng quan mô hình
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -368,7 +368,7 @@ Trong thực tế, không thể tối ưu tất cả đặc tính đồng thời
 └─────────────────────────────────────────────────────┘
 ```
 
-### 3.2 Lớp Cảm nhận (Perception Layer)
+### 4.2 Lớp Cảm nhận (Perception Layer)
 
 **Vai trò**: Giao diện vật lý giữa thế giới số và thế giới thực.
 
@@ -400,7 +400,7 @@ Trong thực tế, không thể tối ưu tất cả đặc tính đồng thời
                        └── Deep sleep giữa các lần đọc
 ```
 
-### 3.3 Lớp Mạng (Network Layer)
+### 4.3 Lớp Mạng (Network Layer)
 
 **Vai trò**: Xử lý truyền thông giữa thiết bị, gateway và dịch vụ đám mây.
 
@@ -416,7 +416,7 @@ Trong thực tế, không thể tối ưu tất cả đặc tính đồng thời
 | **5G (mMTC)** | 1 km | 10 Gbps | Trung bình | Xe tự lái, AR/VR |
 | **Vệ tinh** | Toàn cầu | Khác nhau | Cao | Hàng hải, khai thác mỏ |
 
-### 3.4 Lớp Xử lý Biên (Edge/Processing Layer)
+### 4.4 Lớp Xử lý Biên (Edge/Processing Layer)
 
 **Vai trò**: Xử lý dữ liệu gần nguồn phát, giảm độ trễ, tiết kiệm băng thông, hỗ trợ hoạt động offline.
 
@@ -460,7 +460,7 @@ Nhiệt độ đọc 95°C (ngưỡng: 90°C)
   → Đám mây: Ghi log sự kiện (không khẩn cấp)
 ```
 
-### 3.5 Lớp Ứng dụng (Application Layer)
+### 4.5 Lớp Ứng dụng (Application Layer)
 
 **Vai trò**: Chuyển đổi dữ liệu IoT thô thành giá trị kinh doanh.
 
@@ -719,7 +719,7 @@ Giai đoạn 1: POC/MVP   Giai đoạn 2: Tăng trưởng   Giai đoạn 3: Quy 
 
 ## 6. Giao thức truyền thông trong IoT
 
-### 5.1 MQTT — Tiêu chuẩn IoT
+### 6.1 MQTT — Tiêu chuẩn IoT
 
 **Message Queuing Telemetry Transport** — giao thức Publish/Subscribe qua TCP, được thiết kế cho băng thông thấp và mạng không ổn định.
 
@@ -763,7 +763,7 @@ cmd/{device_id}/cau_hinh
 - **EMQX**: Mã nguồn mở, hiệu suất cao, clustering
 - **AWS IoT Core / Azure IoT Hub**: Dịch vụ quản lý
 
-### 5.2 Bảng so sánh giao thức
+### 6.2 Bảng so sánh giao thức
 
 | Tiêu chí | MQTT | CoAP | AMQP | HTTP | WebSocket |
 |---|---|---|---|---|---|
@@ -776,7 +776,7 @@ cmd/{device_id}/cau_hinh
 | **Hỗ trợ offline** | Có | Không | Có | Không | Không |
 | **Hỗ trợ trình duyệt** | Qua WebSocket | Không | Không | Native | Native |
 
-### 5.3 Cây quyết định chọn giao thức
+### 6.3 Cây quyết định chọn giao thức
 
 ```
 Thiết bị cực kỳ hạn chế (< 10KB RAM)?        → CoAP
@@ -787,7 +787,7 @@ API quản lý thiết bị?                          → HTTP/REST
 Mặc định?                                     → MQTT
 ```
 
-### 5.4 Kiến trúc đa giao thức
+### 6.4 Kiến trúc đa giao thức
 
 Trong thực tế, hệ thống IoT thường sử dụng **nhiều giao thức** tại các điểm khác nhau:
 
@@ -802,7 +802,7 @@ Cảm biến(BLE) → Gateway(CoAP→MQTT) → MQTT Broker → Cloud
 
 ## 7. Bảo mật trong kiến trúc IoT
 
-### 6.1 Thách thức bảo mật IoT
+### 7.1 Thách thức bảo mật IoT
 
 - **Quy mô**: Hàng triệu thiết bị = hàng triệu điểm xâm nhập tiềm năng
 - **Đa dạng**: Phần cứng, OS, firmware khác nhau
@@ -818,7 +818,7 @@ Cảm biến(BLE) → Gateway(CoAP→MQTT) → MQTT Broker → Cloud
 | **Casino Fish Tank** | Hacker xâm nhập qua nhiệt kế bể cá thông minh để đánh cắp dữ liệu |
 | **Stuxnet** | Tấn công SCADA công nghiệp vào máy ly tâm hạt nhân |
 
-### 6.2 Bảo mật theo từng lớp
+### 7.2 Bảo mật theo từng lớp
 
 | Lớp | Mối đe dọa | Biện pháp giảm thiểu |
 |---|---|---|
@@ -827,7 +827,7 @@ Cảm biến(BLE) → Gateway(CoAP→MQTT) → MQTT Broker → Cloud
 | **Biên** | Truy cập trái phép, malware | Firewall, container isolation, signed firmware |
 | **Ứng dụng** | Rò rỉ dữ liệu, injection, DDoS | OAuth 2.0, rate limiting, WAF, mã hóa |
 
-### 6.3 Kiến trúc Zero Trust cho IoT
+### 7.3 Kiến trúc Zero Trust cho IoT
 
 **Nguyên tắc: Không bao giờ tin tưởng, luôn xác minh — kể cả thiết bị nội bộ.**
 
@@ -843,7 +843,7 @@ Cảm biến(BLE) → Gateway(CoAP→MQTT) → MQTT Broker → Cloud
 4. **Giám sát liên tục**: Phát hiện bất thường trong hành vi thiết bị
 5. **Cập nhật OTA an toàn**: Ký mã (code signing), rollback, triển khai từng bước
 
-### 6.4 Quyền riêng tư dữ liệu
+### 7.4 Quyền riêng tư dữ liệu
 
 | Quy định | Khu vực | Yêu cầu chính |
 |---|---|---|
@@ -863,7 +863,7 @@ Cảm biến(BLE) → Gateway(CoAP→MQTT) → MQTT Broker → Cloud
 
 ## 8. Điện toán biên (Edge Computing)
 
-### 7.1 Tại sao Edge Computing là thiết yếu
+### 8.1 Tại sao Edge Computing là thiết yếu
 
 Edge computing đã chuyển từ khái niệm bổ sung thành **thành phần cốt lõi** của kiến trúc IoT hiện đại.
 
@@ -875,7 +875,7 @@ Edge computing đã chuyển từ khái niệm bổ sung thành **thành phần 
 | **Tuân thủ dữ liệu** | Giữ dữ liệu trong phạm vi địa lý (GDPR, luật pháp VN) |
 | **Khả năng mở rộng** | Phân tán tải xử lý thay vì tập trung tại cloud |
 
-### 7.2 Công nghệ Edge Computing
+### 8.2 Công nghệ Edge Computing
 
 | Công nghệ | Loại | Mô tả |
 |---|---|---|
@@ -886,7 +886,7 @@ Edge computing đã chuyển từ khái niệm bổ sung thành **thành phần 
 | **NVIDIA Jetson** | Phần cứng | GPU-enabled edge AI |
 | **Node-RED** | Low-code | Flow-based programming cho IoT |
 
-### 7.3 AI tại biên (Edge AI)
+### 8.3 AI tại biên (Edge AI)
 
 ```
 Mô hình truyền thống:
@@ -910,7 +910,7 @@ Mô hình Edge AI:
 
 ## 9. Xu hướng công nghệ mới
 
-### 8.1 AIoT (AI + IoT)
+### 9.1 AIoT (AI + IoT)
 
 AI tích hợp trực tiếp vào hệ thống IoT, biến thiết bị từ **nguồn dữ liệu thụ động** thành **tác nhân thông minh tự chủ**.
 
@@ -918,14 +918,14 @@ AI tích hợp trực tiếp vào hệ thống IoT, biến thiết bị từ **n
 - **Học liên kết (Federated Learning)**: Huấn luyện mô hình phân tán không cần tập trung dữ liệu
 - **Ra quyết định tự chủ**: Thiết bị hoạt động không cần kết nối cloud
 
-### 8.2 Digital Twins (Bản sao số)
+### 9.2 Digital Twins (Bản sao số)
 
 - Bản sao ảo thời gian thực của tài sản vật lý
 - Đồng bộ liên tục qua luồng dữ liệu IoT
 - Mô phỏng kịch bản "what-if" trước khi thay đổi thực tế
 - **Công cụ**: Azure Digital Twins, AWS IoT TwinMaker, NVIDIA Omniverse
 
-### 8.3 5G + IoT
+### 9.3 5G + IoT
 
 | Tính năng 5G | Ứng dụng IoT |
 |---|---|
@@ -933,21 +933,21 @@ AI tích hợp trực tiếp vào hệ thống IoT, biến thiết bị từ **n
 | **mMTC** (1M thiết bị/km²) | Triển khai cảm biến quy mô lớn |
 | **Network Slicing** | Mạng ảo chuyên dụng cho mỗi ứng dụng IoT |
 
-### 8.4 IoT bền vững (Green IoT)
+### 9.4 IoT bền vững (Green IoT)
 
 - Thu hoạch năng lượng (solar, thermal, kinetic) cho cảm biến không pin
 - Tối ưu duty cycling và chế độ ngủ
 - Carbon-aware computing: dịch chuyển workload đến vùng năng lượng sạch
 - Thiết kế thiết bị có tuổi thọ 10+ năm
 
-### 8.5 Matter Protocol
+### 9.5 Matter Protocol
 
 - Tiêu chuẩn thống nhất cho nhà thông minh
 - Hỗ trợ bởi Apple, Google, Amazon, Samsung
 - Xây dựng trên Thread (mesh) và WiFi
 - Một thiết bị hoạt động với tất cả hệ sinh thái
 
-### 8.6 IoT vệ tinh
+### 9.6 IoT vệ tinh
 
 - Kết nối trực tiếp thiết bị-vệ tinh cho tài sản ở xa
 - Ứng dụng: hàng hải, nông nghiệp, dầu khí, lâm nghiệp
@@ -957,56 +957,99 @@ AI tích hợp trực tiếp vào hệ thống IoT, biến thiết bị từ **n
 
 ## 10. Nghiên cứu tình huống thực tế
 
-### 9.1 Nhà máy thông minh (Industry 4.0)
+> Các tình huống dưới đây là các dự án **thực tế từ các công ty lớn**, có tài liệu công khai từ AWS re:Invent, Microsoft Customer Stories, Databricks Blog và học thuật Harvard.
+
+### 10.1 Rolls-Royce — IntelligentEngine (Bảo trì dự đoán động cơ máy bay)
 
 | Yếu tố | Chi tiết |
 |---|---|
-| **Bối cảnh** | Nhà máy sản xuất với 500+ cảm biến |
-| **Kiến trúc** | Edge-Cloud Hybrid + EDA + Microservices |
-| **Giao thức** | MQTT (QoS 1) cho telemetry |
-| **Edge** | K3s trên NVIDIA Jetson — AI phát hiện lỗi |
-| **CSDL** | InfluxDB cho chuỗi thời gian |
-| **Dashboard** | Grafana thời gian thực |
+| **Công ty** | Rolls-Royce Holdings plc |
+| **Lĩnh vực** | Hàng không dân dụng / IIoT |
+| **Quy mô** | 4,500+ động cơ máy bay được giám sát liên tục |
+| **Mô hình kinh doanh** | TotalCare "Power by the Hour" — hãng bay trả theo giờ bay |
+| **Kiến trúc** | Edge-Cloud Hybrid + Digital Twin |
+| **Cloud** | Microsoft Azure (IoT Backend + Databricks) |
+| **Giao thức** | MQTT qua liên kết vệ tinh/mặt đất |
+| **Đặc tính chủ đạo** | Độ tin cậy, Hiệu năng, Khả năng quan sát |
 
-**Kết quả**:
-- Giảm **30% thời gian ngừng máy** nhờ bảo trì dự đoán
-- Tiết kiệm **$2M/năm** từ phát hiện lỗi sớm
-- **99.9%** độ tin cậy gửi dữ liệu qua MQTT QoS 1
+**Quyết định kiến trúc quan trọng:**
+- **Xử lý tại biên (ECU)**: Tiền xử lý tại chỗ giảm khối lượng truyền và phát hiện bất thường tức thì
+- **Lớp chuẩn hóa dữ liệu**: Hàng trăm biến thể động cơ → 1 định dạng thống nhất cho analytics
+- **Azure Databricks + ML**: Mô hình tự học dự đoán hao mòn linh kiện và tuổi thọ còn lại của từng động cơ
+- **Digital Twin**: Bản sao số đồng bộ thời gian thực — mô phỏng "what-if" trước khi can thiệp bảo trì
 
-### 9.2 Quản lý giao thông thành phố thông minh
+**Kết quả** (nguồn: Microsoft Customer Story):
+- Tiết kiệm **hàng triệu USD** nhờ tránh được bảo trì ngoài kế hoạch
+- Giám sát thời gian thực **4,500+ động cơ** trên toàn cầu đội bay thương mại
+- Mô hình TotalCare khả thi: chỉ có thể cam kết SLA khả dụng khi IoT dự đoán được chính xác
 
-| Yếu tố | Chi tiết |
-|---|---|
-| **Bối cảnh** | Tối ưu giao thông toàn thành phố |
-| **Kiến trúc** | Edge-First + Event-Driven |
-| **Edge AI** | NVIDIA Jetson + TensorRT — xử lý video tại nút giao |
-| **Giao thức** | MQTT cho sự kiện, HTTP cho cấu hình |
+**Bài học kiến trúc:** *Mô hình kinh doanh và kiến trúc gắn liền nhau* — dịch vụ "Power by the Hour" không thể tồn tại nếu không có khả năng giám sát dự đoán liên tục. Kiến trúc IoT không phải là tính năng, mà là sản phẩm.
 
-**Kết quả**:
-- Cải thiện **20% lưu lượng giao thông**
-- Giảm **15% khí thải** tại các nút giao được giám sát
-- **Tuân thủ quyền riêng tư**: Video xử lý cục bộ, chỉ gửi metadata
+---
 
-### 9.3 Y tế kết nối
+### 10.2 John Deere — Nền tảng Nông nghiệp Chính xác IoT
 
 | Yếu tố | Chi tiết |
 |---|---|
-| **Bối cảnh** | Giám sát bệnh nhân liên tục bằng thiết bị đeo |
-| **Kiến trúc** | Serverless + Event-Driven |
-| **Bảo mật** | mTLS + AES-256 + tuân thủ HIPAA |
-| **Cảnh báo** | AWS Lambda (serverless) |
-| **Tích hợp EHR** | AMQP + HL7 FHIR |
+| **Công ty** | Deere & Company (John Deere) |
+| **Lĩnh vực** | Nông nghiệp / Thiết bị kết nối |
+| **Quy mô** | 1.5 triệu máy kết nối, 500 triệu mẫu Anh được quản lý (mục tiêu 2026) |
+| **Tần suất** | Telemetry mỗi **5 giây** từ mỗi máy |
+| **Tăng trưởng dữ liệu** | Khối lượng dữ liệu tăng gấp đôi/gấp ba mỗi năm |
+| **Kiến trúc** | Multi-Cloud Hybrid + Edge + Microservices |
+| **Cloud** | AWS (chính) + Azure Arc + Data Center riêng |
+| **Công nghệ AWS** | DynamoDB, Kinesis, OpenSearch, S3 |
+| **Đặc tính chủ đạo** | Khả năng mở rộng, Tính tương tác, Hiệu năng |
 
-**Kết quả**:
-- Phản ứng khẩn cấp **nhanh hơn 40%**
-- Giám sát **liên tục** thay cho kiểm tra thủ công 4 giờ/lần
-- **Tuân thủ HIPAA** hoàn toàn với audit trail
+**Quyết định kiến trúc quan trọng:**
+- **Multi-cloud có chủ đích**: AWS cho IoT/analytics; Azure cho vận hành nhà máy sản xuất — các workload khác nhau cần nền tảng khác nhau
+- **Kinesis cho streaming**: Xử lý dữ liệu thời gian thực ở quy mô tăng trưởng hàm mũ
+- **AI cấp độ từng cây trồng**: Mô hình Databricks xác định lượng hạt giống/phân bón tối ưu cho từng cây trong hàng — hàng nghìn cây/giây/máy
+- **Telemetry 5 giây**: Cân bằng giữa dữ liệu thời gian thực có hành động và băng thông mạng di động
+
+**Kết quả** (nguồn: Databricks Blog, AWS Case Study):
+- Kết nối **1.5 triệu máy**, quản lý **500 triệu mẫu Anh** với dữ liệu thời gian thực
+- **Nông nghiệp chính xác cấp cây trồng**: AI xác định xử lý tối ưu cho từng cây — chuyển đổi từ quy mô cánh đồng sang quy mô cây trồng
+- Giảm lãng phí phân bón, thuốc trừ sâu, hạt giống thông qua công nghệ tỷ lệ biến thiên
+- Kiến trúc được thiết kế để xử lý **dữ liệu tăng gấp đôi mỗi năm** mà không cần tái kiến trúc
+
+**Bài học kiến trúc:** *Thiết kế cho tăng trưởng 10× ngay từ đầu* — dữ liệu tăng hàm mũ, không tuyến tính. Multi-cloud không phải để tránh lock-in mà để chọn nền tảng phù hợp nhất cho từng loại workload.
+
+---
+
+### 10.3 Siemens MindSphere / Insights Hub — Nền tảng IIoT PaaS
+
+| Yếu tố | Chi tiết |
+|---|---|
+| **Công ty** | Siemens AG |
+| **Lĩnh vực** | Nền tảng IoT công nghiệp (PaaS) |
+| **Đặc điểm** | Multi-tenant — phục vụ hàng nghìn khách hàng công nghiệp toàn cầu |
+| **Kiến trúc** | Microservices + EDA + Hybrid Cloud |
+| **Cloud** | AWS (hosted) |
+| **Streaming** | Amazon Kinesis (managed) HOẶC Apache Kafka (self-managed) |
+| **App platform** | Cloud Foundry |
+| **Tài liệu công khai** | AWS re:Invent 2019, session MFG202 |
+| **Đặc tính chủ đạo** | Khả năng mở rộng, Tính tương tác (200+ giao thức công nghiệp), Bảo trì |
+
+**Quyết định kiến trúc quan trọng:**
+- **"Đi theo sáng tạo của AWS"**: Siemens chọn dịch vụ managed của AWS thay vì tự quản lý — giảm chi phí vận hành và tự động được cải tiến hạ tầng
+- **Cung cấp cả Kinesis lẫn Kafka**: Khách hàng có yêu cầu quản trị khác nhau — managed service (Kinesis) cho đơn giản, self-hosted (Kafka) cho kiểm soát
+- **Microservices lỏng lẻo**: Mỗi chức năng (quản lý tài sản, identity, analytics, time-series) scale và cập nhật độc lập
+- **MindConnect Elements**: Adapter phần cứng agnostic kết nối bất kỳ thiết bị công nghiệp nào (OPC UA, Modbus, S7, REST, MQTT) với nền tảng
+
+**Kết quả — Triển khai Rittal Blue e+** (nguồn: AWS Case Study, Siemens Whitepaper):
+- Giảm **75%** tiêu thụ năng lượng của hệ thống làm mát kết nối mạng
+- Giảm **75%** lượng carbon thải ra
+- ROI dưới **3 tháng** được ghi nhận trong các kịch bản bảo trì dự đoán
+- **15+ năm** phát triển nền tảng — hệ sinh thái **1,700+ đối tác** và ứng dụng
+
+**Bài học kiến trúc:** *Tính tương tác giao thức mới là hào kinh tế thực sự* — khả năng kết nối bất kỳ thiết bị công nghiệp nào (200+ giao thức) khó sao chép hơn nhiều so với stack analytics trên đám mây. Cung cấp lựa chọn managed vs self-managed streaming cho phép đáp ứng các yêu cầu quản trị khác nhau mà không phân nhánh kiến trúc.
 
 ---
 
 ## 11. Kết luận và khuyến nghị
 
-### 10.1 Tóm tắt các điểm chính
+### 11.1 Tóm tắt các điểm chính
 
 1. **Kiến trúc phân lớp** cung cấp phân tách trách nhiệm rõ ràng — hiểu vai trò của từng lớp
 2. **Chọn mẫu kiến trúc dựa trên yêu cầu**, không phải xu hướng — sử dụng framework chọn lựa
@@ -1016,7 +1059,7 @@ AI tích hợp trực tiếp vào hệ thống IoT, biến thiết bị từ **n
 6. **AIoT và Digital Twins** đang định hình lại khả năng của IoT
 7. **Không có mẫu nào phù hợp tất cả** — kết hợp các mẫu cho nhu cầu cụ thể
 
-### 10.2 Khuyến nghị cho tổ chức
+### 11.2 Khuyến nghị cho tổ chức
 
 | Quy mô | Khuyến nghị kiến trúc |
 |---|---|
@@ -1025,7 +1068,7 @@ AI tích hợp trực tiếp vào hệ thống IoT, biến thiết bị từ **n
 | **Doanh nghiệp (10K+)** | Edge-Cloud Hybrid + Microservices + EDA |
 | **IoT công nghiệp** | Edge-First + AI at Edge + MQTT + Digital Twins |
 
-### 10.3 Lộ trình triển khai đề xuất
+### 11.3 Lộ trình triển khai đề xuất
 
 ```
 Giai đoạn 1 (0-3 tháng): Foundation

@@ -294,23 +294,47 @@ POC → Layered → Microservices + Serverless → + EDA → + Edge-Cloud Hybrid
 
 ## Part 7: Case Studies & Emerging Trends (15 min)
 
-### Slide 30 — Case Study: Smart Factory (Industry 4.0)
-- Architecture: 500+ sensors → Edge gateways → MQTT broker → Microservices backend → Dashboard
-- Patterns used: Edge-Cloud Hybrid + EDA + Microservices
-- Results: 30% reduction in downtime, predictive maintenance saving $2M/year
-- Key decisions: MQTT for telemetry, InfluxDB for time-series, Grafana for visualization
+### Slide 30 — Case Study: Rolls-Royce IntelligentEngine
+- **Company:** Rolls-Royce | **Domain:** Civil aviation jet engine monitoring
+- **Scale:** 4,500+ engines continuously monitored; thousands of sensors per engine
+- **Architecture:** Sensors → ECU (edge preprocessing) → MQTT → Azure IoT Backend → Databricks ML → 24/7 Monitoring Centers
+- **Patterns:** Edge-Cloud Hybrid + Digital Twin
+- **Key decisions:**
+  - MQTT over satellite/ground links for reliable delivery
+  - Edge preprocessing at ECU reduces transmission volume
+  - Data normalization layer standardizes diverse engine variants
+  - Azure Databricks for self-learning predictive maintenance models
+- **Results:** Millions in cost avoidance; enables TotalCare "Power by the Hour" commercial model
+- **Architecture lesson:** *Business model and architecture are inseparable — the IoT system IS the product*
+- **Source:** [Microsoft Customer Story](https://www.microsoft.com/en/customers/story/23201-rolls-royce-azure-databricks) | [RTInsights](https://www.rtinsights.com/rolls-royce-jet-engine-maintenance-iot/)
 
-### Slide 31 — Case Study: Smart City Traffic Management
-- Architecture: Traffic cameras + sensors → Edge AI → Central cloud → Real-time optimization
-- Patterns used: Edge computing + AI inference + Event-driven
-- Results: 20% improvement in traffic flow, 15% reduction in emissions
-- Key insight: Processing video at the edge (privacy + bandwidth)
+### Slide 31 — Case Study: John Deere Precision Agriculture
+- **Company:** Deere & Company (John Deere) | **Domain:** Connected agricultural equipment
+- **Scale:** 1.5M+ machines connected; 500M acres managed; telemetry every 5 seconds; data doubles annually
+- **Architecture:** Machines (sensors + GPS + computer vision) → JDLink (cellular) → Multi-Cloud (AWS + Azure Arc + Private DC) → AI/ML Pipeline → Operations Center
+- **Patterns:** Multi-Cloud Hybrid + Edge + Microservices
+- **Key AWS services:** DynamoDB, Kinesis (streaming), OpenSearch (analytics), S3
+- **Key decisions:**
+  - Multi-cloud by design: AWS for IoT/analytics, Azure for manufacturing operations
+  - Databricks for individual-plant-level AI (thousands of plants/second/machine)
+  - 5-second telemetry balances real-time value vs. cellular bandwidth
+- **Results:** Individual plant precision agriculture; variable-rate prescriptions reduce input waste
+- **Architecture lesson:** *Design for 10× growth from day one; data volume is exponential, not linear*
+- **Source:** [Databricks Blog](https://www.databricks.com/blog/2021/07/09/down-to-the-individual-grain-how-john-deere-uses-industrial-ai-to-increase-crop-yields-through-precision-agriculture.html) | [Harvard D3](https://d3.harvard.edu/platform-digit/submission/farm-to-data-table-john-deere-and-data-in-precision-agriculture/)
 
-### Slide 32 — Case Study: Connected Healthcare
-- Architecture: Wearable devices → Mobile gateway → HIPAA-compliant cloud → Clinical dashboard
-- Patterns used: Serverless + Event-driven + Strict security
-- Results: Continuous patient monitoring, 40% faster emergency response
-- Key challenge: Regulatory compliance (HIPAA, HL7 FHIR)
+### Slide 32 — Case Study: Siemens MindSphere / Insights Hub
+- **Company:** Siemens AG | **Domain:** Industrial IoT Platform-as-a-Service
+- **Scale:** Multi-tenant global platform; 1,700+ partner ecosystem; supports 200+ industrial protocols
+- **Architecture:** Industrial equipment → MindConnect adapters (OPC UA, Modbus, S7, MQTT) → AWS-hosted microservices → Kinesis/Kafka streaming → Customer analytics apps
+- **Patterns:** Microservices + EDA + Hybrid Cloud (Public / Private / Cloud-Dedicated)
+- **Key decisions:**
+  - Use AWS managed services rather than self-managing infrastructure
+  - Offer both Kinesis (managed) and Kafka (self-managed) — customer governance choice
+  - Loosely-coupled containerized microservices for independent scaling
+  - MindConnect Elements: hardware-agnostic protocol bridge
+- **Results (Rittal Blue e+ case):** 75% energy reduction; 75% carbon reduction; sub-3-month ROI
+- **Architecture lesson:** *Protocol interoperability is the real competitive moat — harder to replicate than the cloud analytics stack*
+- **Source:** [AWS re:Invent 2019 MFG202](https://d1.awsstatic.com/events/reinvent/2019/Building_on_AWS_The_architecture_of_the_Siemens_MindSphere_platform_MFG202.pdf) | [AWS Case Study](https://aws.amazon.com/solutions/case-studies/siemens-mindsphere/)
 
 ### Slide 33 — Emerging Trends (2025–2026)
 - **AIoT (AI + IoT)**: AI models running on edge devices for autonomous decisions
