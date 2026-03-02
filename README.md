@@ -18,24 +18,27 @@
 By the end of this seminar, participants will be able to:
 
 1. **Describe** the layered IoT reference architecture and the role of each layer
-2. **Compare** architectural patterns (monolithic, microservices, event-driven, serverless) in IoT contexts
-3. **Evaluate** communication protocols (MQTT, CoAP, AMQP, HTTP) for different IoT scenarios
-4. **Design** edge-cloud hybrid architectures that balance latency, cost, and scalability
-5. **Apply** security best practices across all layers of an IoT system
-6. **Identify** real-world case studies and emerging trends (AIoT, Digital Twins, 5G)
+2. **Identify** architecture characteristics (quality attributes) relevant to an IoT system and explain how they drive pattern selection
+3. **Compare** architectural patterns (monolithic, microservices, event-driven, serverless, edge-cloud hybrid) in IoT contexts
+4. **Evaluate** communication protocols (MQTT, CoAP, AMQP, HTTP) for different IoT scenarios
+5. **Design** edge-cloud hybrid architectures that balance latency, cost, and scalability
+6. **Apply** security best practices across all layers of an IoT system
+7. **Identify** real-world case studies and emerging trends (AIoT, Digital Twins, 5G)
 
 ## 📂 Repository Structure
 
 ```
 iot-software-architecture/
 ├── README.md                          # This file
-├── PRESENTATION.md                    # Slide-by-slide presentation outline
+├── PRESENTATION.md                    # Slide-by-slide presentation outline (36 slides)
+├── report.md                          # Detailed Vietnamese report (12 sections)
 ├── docs/
 │   ├── 01-reference-architecture.md   # IoT Reference Architecture deep-dive
 │   ├── 02-patterns.md                 # Architecture patterns for IoT
 │   ├── 03-protocols.md                # Communication protocols comparison
 │   ├── 04-security.md                 # Security considerations
-│   └── 05-case-studies.md             # Real-world case studies & trends
+│   ├── 05-case-studies.md             # Real-world case studies & trends
+│   └── 06-architecture-characteristics.md  # Architecture characteristics (quality attributes)
 └── diagrams/
     └── (architecture diagrams)
 ```
@@ -46,11 +49,12 @@ iot-software-architecture/
 |---|---|---|---|
 | 1 | Introduction & IoT Landscape | 10 min | [PRESENTATION.md](PRESENTATION.md) |
 | 2 | IoT Reference Architecture | 15 min | [Reference Architecture](docs/01-reference-architecture.md) |
-| 3 | Architecture Patterns | 15 min | [Patterns](docs/02-patterns.md) |
-| 4 | Communication Protocols | 15 min | [Protocols](docs/03-protocols.md) |
-| 5 | Security & Privacy | 10 min | [Security](docs/04-security.md) |
-| 6 | Case Studies & Emerging Trends | 15 min | [Case Studies](docs/05-case-studies.md) |
-| 7 | Q&A and Discussion | 10 min | — |
+| 3 | Architecture Characteristics | 10 min | [Architecture Characteristics](docs/06-architecture-characteristics.md) |
+| 4 | Architecture Patterns | 15 min | [Patterns](docs/02-patterns.md) |
+| 5 | Communication Protocols | 10 min | [Protocols](docs/03-protocols.md) |
+| 6 | Security & Privacy | 10 min | [Security](docs/04-security.md) |
+| 7 | Case Studies & Emerging Trends | 15 min | [Case Studies](docs/05-case-studies.md) |
+| 8 | Q&A and Discussion | 5 min | — |
 
 ## 🚀 How to Use This Repository
 
@@ -61,6 +65,7 @@ iot-software-architecture/
 
 ## 📚 Key References
 
+- [AWS IoT Well-Architected Lens](https://docs.aws.amazon.com/wellarchitected/latest/iot-lens/welcome.html)
 - [AWS IoT Reference Architecture](https://docs.aws.amazon.com/iot/latest/developerguide/what-is-aws-iot.html)
 - [Microsoft Azure IoT Reference Architecture](https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/iot)
 - [MQTT Specification v5.0](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html)

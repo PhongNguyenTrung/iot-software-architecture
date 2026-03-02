@@ -2,6 +2,8 @@
 
 > IoT expands the attack surface dramatically. Security must be an integral part of the architecture from day one.
 
+> **Architecture Characteristics Note:** Security is one of 8 architecture characteristics that drive IoT structural decisions. Unlike most characteristics, security is a **structural requirement** — it cannot be added after the fact — and creates explicit tradeoffs with Performance (TLS latency) and Energy Efficiency (encryption overhead). For the full characteristics framework, see [06-architecture-characteristics.md](06-architecture-characteristics.md).
+
 ---
 
 ## The IoT Security Challenge
