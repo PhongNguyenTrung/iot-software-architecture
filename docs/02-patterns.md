@@ -226,6 +226,8 @@ Application logic runs in stateless, event-triggered functions managed by a clou
 - Sporadic or unpredictable workloads
 - Small teams with limited DevOps capacity
 
+> **Deep dive:** For cost analysis, cold start mitigation, cloud provider comparison (AWS/Azure/GCP), four architecture patterns with ASCII diagrams, security, observability, and a decision framework with real cost numbers, see [07-serverless-iot.md](07-serverless-iot.md).
+
 ---
 
 ## 5. Edge-Cloud Hybrid Architecture
