@@ -242,41 +242,194 @@ Cảm biến ──publish──▶ [Event Broker] ──deliver──▶ Consum
 
 **Phù hợp**: Pipeline cảnh báo, biến đổi dữ liệu, workload không đoán trước, đội nhỏ.
 
+> **Phân tích chuyên sâu:** Xem [docs/07-serverless-iot.md](docs/07-serverless-iot.md) — bao gồm phân tích chi phí thực tế theo quy mô fleet, so sánh AWS/Azure/GCP, 4 mẫu kiến trúc chi tiết (alerting, telemetry, provisioning, OTA), cold start, bảo mật và quan sát, với nguồn trích dẫn uy tín.
+
 ---
 
 ### 3.5 Kiến trúc lai Biên-Đám mây (Edge-Cloud Hybrid)
 
-**Mô tả**: Phân phối xử lý giữa edge (gần thiết bị) và cloud. Đây là **mẫu kiến trúc chủ đạo cho IoT doanh nghiệp** từ 2025.
+**Mô tả**: Phân phối xử lý giữa edge (gần thiết bị) và cloud. Đây là **mẫu kiến trúc chủ đạo cho IoT doanh nghiệp** từ 2025. Thay vì gửi toàn bộ dữ liệu thô lên đám mây, hệ thống xử lý dữ liệu nhạy cảm về thời gian ngay tại edge, chỉ đồng bộ dữ liệu tổng hợp và trạng thái quan trọng lên cloud.
 
 ```
-┌────────────── ĐÁM MÂY ──────────────┐
-│  Huấn luyện ML │ Lưu trữ dài hạn    │
-│  Quản lý fleet │ Dashboard & APIs    │
-└──────────────────┬───────────────────┘
-                   │ Đồng bộ
-┌──────────────────┼───────────────────┐
-│             BIÊN (EDGE)              │
-│  Rules Engine │ Local DB │ AI Model  │
-│  Gateway │ Protocol Bridge           │
-└──────────────────┬───────────────────┘
-                   │
-        ┌──────────┼──────────┐
-    [Cảm biến] [Camera] [Actuator]
+┌──────────────────────────── ĐÁM MÂY ─────────────────────────────┐
+│  Huấn luyện ML  │  Lưu trữ dài hạn  │  Quản lý fleet  │  APIs   │
+│  Digital Twin   │  Phân tích BI      │  OTA Updates    │ Dashboard│
+└──────────────────────────────┬────────────────────────────────────┘
+                               │ Đồng bộ tổng hợp / lệnh điều khiển
+                               │ (MQTT, AMQP, HTTPS — mã hoá TLS 1.3)
+┌──────────────────────────────┼────────────────────────────────────┐
+│                        BIÊN (EDGE)                                │
+│  Rules Engine │  Local Time-Series DB  │  AI Inference Model     │
+│  Protocol Gateway │  Store-and-Forward Buffer │  OPC-UA Server   │
+└──────────────────────────────┬────────────────────────────────────┘
+                               │ Fieldbus / OPC-UA / MQTT
+              ┌────────────────┼────────────────┐
+         [Cảm biến]       [Camera]          [Actuator]
+              TẦNG THIẾT BỊ (Device Tier)
 ```
 
-**Phân tích đánh đổi:**
+#### Mô hình đồng bộ hóa
+
+| Mô hình | Mô tả | Trường hợp sử dụng |
+|---|---|---|
+| **Store-and-Forward** | Đệm dữ liệu cục bộ, gửi khi có mạng | Kết nối không ổn định (mạng di động, vệ tinh) |
+| **Eventual Consistency** | Biên và đám mây hội tụ theo thời gian | Telemetry không khẩn cấp |
+| **Edge-First** | Biên ra quyết định, đám mây học từ đó | Hệ thống an toàn thời gian thực (IIoT) |
+| **Cloud-First** | Đám mây ra quyết định, biên thực thi | Điều phối toàn fleet |
+| **Bi-directional Sync** | Cả biên và đám mây đều có thể sửa đổi trạng thái | Device twin / device shadow |
+
+> **Nguồn:** AWS IoT Greengrass — [Store and forward messages](https://docs.aws.amazon.com/greengrass/v2/developerguide/store-and-forward.html); Azure IoT Hub — [Device twins](https://learn.microsoft.com/en-us/azure/iot-hub/iot-hub-devguide-device-twins)
+
+#### Nền tảng triển khai phổ biến (2025)
+
+| Nền tảng | Nhà cung cấp | Khả năng cốt lõi | Nguồn |
+|---|---|---|---|
+| **AWS IoT Greengrass v2** | Amazon Web Services | Lambda tại edge, local MQTT broker, shadow sync, component model | [AWS Docs](https://docs.aws.amazon.com/greengrass/v2/developerguide/what-is-iot-greengrass.html) |
+| **Azure IoT Edge** | Microsoft | Docker containers tại edge, offline operation, IoT Hub integration, AI deployment | [MS Docs](https://learn.microsoft.com/en-us/azure/iot-edge/about-iot-edge) |
+| **Google Distributed Cloud Edge** | Google Cloud | Kubernetes tại edge, Vertex AI Edge deployment, Anthos clusters | [GCP Docs](https://cloud.google.com/distributed-cloud/edge/latest/docs/overview) |
+| **Eclipse Kura** | Eclipse Foundation | OSGi-based open-source edge framework, protocol bridging (OPC-UA, Modbus) | [Eclipse Kura](https://eclipse.dev/kura/) |
+| **K3s + Rancher** | SUSE/Rancher | Lightweight Kubernetes tại edge node, phù hợp IIoT on-premise | [K3s.io](https://k3s.io/) |
+
+#### Hệ sinh thái mã nguồn mở (CNCF & LF Edge)
+
+Ngoài các nền tảng thương mại, cộng đồng mã nguồn mở cung cấp các framework được quản trị bởi CNCF và Linux Foundation:
+
+| Dự án | Tổ chức | Đặc điểm nổi bật | Nguồn |
+|---|---|---|---|
+| **KubeEdge** | CNCF Graduated (9/2024) | Kubernetes-native edge, chỉ 70MB RAM, tự chủ offline hoàn toàn, CloudHub + EdgeController + Edged | [kubeedge.io](https://kubeedge.io/) · [CNCF](https://www.cncf.io/projects/kubeedge/) |
+| **Project EVE** | LF Edge Impact Stage (2024) | Universal Linux OS cho edge, multi-node resilience, hỗ trợ bare-metal & VM | [LF Press](https://www.linuxfoundation.org/press/project-eve-hits-maturity-within-lf-edge-releases-multi-node-support-for-enhanced-edge-computing-resilience) |
+| **EdgeX Foundry** | LF Edge | Microservices framework cho edge IoT, protocol-agnostic, REST/MQTT APIs | [lfedge.org](https://lfedge.org/our-projects/) |
+| **Eclipse Kura v5.6** | Eclipse Foundation | OSGi-based gateway, Wires visual programming, OPC-UA/Modbus bridge, container deployment | [eclipse-kura.github.io](https://eclipse-kura.github.io/kura/docs-release-5.6/) |
+
+> **KubeEdge vs K3s:** K3s là Kubernetes nhỏ gọn cho các node có đủ tài nguyên (≥ 512MB RAM). KubeEdge phù hợp hơn cho thiết bị cực hạn chế tài nguyên và cần tự chủ hoàn toàn khi mất kết nối đám mây.
+
+#### Tiêu chuẩn & Đặc tả quốc tế
+
+Edge-Cloud Hybrid trong IoT doanh nghiệp phải tuân thủ các tiêu chuẩn sau:
+
+| Tiêu chuẩn | Tổ chức | Nội dung liên quan | Nguồn |
+|---|---|---|---|
+| **NIST SP 800-213** | NIST (Mỹ) | Hướng dẫn bảo mật thiết bị IoT — định danh, cập nhật an toàn, bảo vệ dữ liệu cho edge nodes | [nvlpubs.nist.gov](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-213.pdf) (2022) |
+| **ETSI GS MEC 003 v3.1.1** | ETSI (châu Âu) | Kiến trúc tham chiếu Multi-access Edge Computing — thành phần chức năng, điểm tham chiếu, MEC services | [etsi.org](https://www.etsi.org/deliver/etsi_gs/MEC/001_099/003/03.01.01_60/gs_mec003v030101p.pdf) (2022) |
+| **ETSI White Paper #59** | ETSI | MEC tích hợp IoT — oneM2M APIs, ETSI MEC APIs, edge service placement | [etsi.org WP59](https://www.etsi.org/images/files/ETSIWhitePapers/ETSI-WP59-Enabling-Multi-access-Edge-Computing-in-iot.pdf) (2020) |
+| **OPC-UA / IEC 62541** | OPC Foundation | Giao thức M2M công nghiệp chuẩn cho gateway biên — semantic data model, publish/subscribe | [Azure Industrial IoT](https://azure.github.io/Industrial-IoT/) |
+
+#### AI tại biên (Edge AI)
+
+Một trong những lợi thế cạnh tranh lớn nhất của Edge-Cloud Hybrid là khả năng chạy **suy diễn ML (inference) ngay tại thiết bị biên** mà không cần kết nối đám mây:
+
+| Phần cứng | Hiệu năng Inference | Trường hợp sử dụng điển hình |
+|---|---|---|
+| **NVIDIA Jetson Orin** | 275 TOPS | Phát hiện đối tượng YOLO 30fps, phân tích video an ninh |
+| **Google Coral TPU** | 4 TOPS | Phân loại hình ảnh nhúng, thiết bị tiêu dùng |
+| **Intel OpenVINO** | Tùy CPU/VPU | Tối ưu mô hình cho edge Intel (NUC, Industrial PC) |
+| **Qualcomm AI Hub** | Tùy SoC | Mobile/embedded inference, smartphone và camera thông minh |
+
+> **Nguồn:** NVIDIA — [Jetson Orin Product Brief](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/); Google — [Coral Edge TPU](https://coral.ai/docs/edgetpu/faq/)
+
+Cập nhật mô hình AI sau khi triển khai yêu cầu **OTA model delivery** — pipeline riêng biệt để đẩy trọng số mô hình mới đến hàng nghìn node biên một cách an toàn và nguyên tử.
+
+**Phân tích đánh đổi chi tiết:**
 
 | Chiều đánh đổi | Ưu điểm | Nhược điểm | Bối cảnh IoT |
 |---|---|---|---|
-| **Độ trễ** | Xử lý cục bộ — < 10ms tại edge | Thêm một tầng kiến trúc phải quản lý | ✅ Ngắt khẩn cấp nhà máy không thể chờ round-trip đám mây (50–200ms) |
-| **Độ tin cậy** | Tiếp tục hoạt động khi mất kết nối đám mây | Đồng bộ sau khi kết nối lại phức tạp | ✅ Nút lưới điện quản lý tải trong khi WAN bị ngắt |
-| **Băng thông** | Tổng hợp tại biên — gửi 1–5% dữ liệu thô lên cloud | Phần cứng edge tốn $500–$5,000+/site | ✅ Nhà máy 500 camera: tiết kiệm 95% băng thông đám mây |
-| **Bảo mật** | Phân đoạn mạng giới hạn bán kính tấn công | Bảo mật vật lý edge là trách nhiệm nhà vận hành | ❌ Kẻ tấn công với quyền truy cập vật lý có thể trích xuất thông tin xác thực |
-| **Độ phức tạp** | Công cụ phù hợp cho IoT doanh nghiệp phức tạp | Mẫu phức tạp nhất — cần chuyên môn hệ thống phân tán | ❌ Nhóm mới với IoT không nên bắt đầu từ đây |
+| **Độ trễ** | Xử lý cục bộ — < 1ms on-device, < 10ms tại edge gateway | Thêm một tầng kiến trúc phải quản lý và quan sát | ✅ Ngắt khẩn cấp an toàn nhà máy không thể chờ round-trip đám mây (50–200ms) |
+| **Độ tin cậy** | Tiếp tục hoạt động khi mất kết nối đám mây | Đồng bộ sau khi kết nối lại phức tạp (conflict resolution, thứ tự, deduplication) | ✅ Nút lưới điện thông minh quản lý tải trong khi WAN bị ngắt 4 giờ |
+| **Băng thông** | Tổng hợp tại biên — gửi 1–5% dữ liệu thô lên cloud | Phần cứng edge (NVIDIA Jetson, PC công nghiệp) tốn $500–$5,000+/site | ✅ Nhà máy 500 camera: xử lý video tại biên tiết kiệm 95% băng thông đám mây |
+| **Chủ quyền dữ liệu** | Dữ liệu nhạy cảm không rời cơ sở vật chất | Residency đạt được qua cấu hình, không phải kiến trúc — cần kỷ luật vận hành | ✅ GDPR/HIPAA: dữ liệu bệnh nhân xử lý tại bệnh viện, không lên cloud |
+| **Bảo mật** | Phân đoạn mạng giới hạn bán kính tấn công khi bị xâm phạm | Bảo mật vật lý phần cứng edge là trách nhiệm nhà vận hành | ❌ Kẻ tấn công với quyền truy cập vật lý có thể trích xuất thông tin xác thực đám mây từ edge gateway |
+| **AI tại biên** | Suy diễn ML không cần round-trip đám mây | Cập nhật mô hình yêu cầu OTA đến hàng nghìn node | ✅ YOLO object detection trên Jetson: 30fps cục bộ. ❌ Deploy mô hình mới đến 1,000 node mất nhiều giờ |
+| **Độ phức tạp** | Công cụ phù hợp cho yêu cầu IoT doanh nghiệp phức tạp | Mẫu phức tạp nhất — cần chuyên môn distributed systems, edge runtime (K3s, Greengrass), sync protocols | ❌ Nhóm mới với IoT không nên bắt đầu từ đây — đường cong học tập trì hoãn ra mắt hàng tháng |
 
-**Khi nào sụp đổ:** Nhóm thiếu kinh nghiệm hệ thống phân tán; dự án hạn chế CapEx; dữ liệu không quan trọng.
+#### Tích hợp 5G và MEC (Multi-access Edge Computing)
 
-**Phù hợp**: IIoT với yêu cầu an toàn, hệ thống cần hoạt động offline, xử lý video/ảnh.
+5G là yếu tố tăng tốc quan trọng cho Edge-Cloud Hybrid. **MEC (Multi-access Edge Computing)** theo chuẩn ETSI đưa tài nguyên tính toán xuống sát trạm gốc 5G (radio access network), loại bỏ hầu hết độ trễ WAN:
+
+| Mô hình kết nối | Độ trễ điển hình | Phù hợp |
+|---|---|---|
+| Thiết bị → Cloud (4G/LTE) | 50–150ms | Telemetry không khẩn cấp |
+| Thiết bị → Edge node on-premise | 1–10ms | IIoT safety, real-time control |
+| Thiết bị → MEC node (5G base station) | < 5ms | Connected vehicles, AR/VR công nghiệp |
+| Thiết bị → On-device inference | < 1ms | Safety shutoff, haptic feedback |
+
+**Ứng dụng MEC-IoT điển hình:**
+- **Nhà máy thông minh**: 5G private network + MEC xử lý telemetry CNC machines tại local, không phụ thuộc WAN
+- **Thành phố thông minh**: Phân tích camera giao thông tại MEC node của nhà mạng, quyết định đèn tín hiệu < 5ms
+- **Xe kết nối (V2X)**: Phát hiện va chạm và phối hợp xe tại MEC, độ trễ không thể đạt được qua cloud
+
+> **Nguồn:** ETSI — [ETSI MEC Technology Page](https://www.etsi.org/technologies/multi-access-edge-computing); ETSI MEC Phase 4 (2024) với Linux Foundation collaboration cho open APIs; MDPI 2024 — [Integrating MEC into Open 5G Core](https://www.mdpi.com/2673-4001/5/2/22)
+
+**Khi nào sụp đổ:**
+- Nhóm thiếu kinh nghiệm hệ thống phân tán — lỗi đồng bộ hóa rất tinh vi và có thể thảm khốc (thực thi lệnh hai lần, mất cập nhật)
+- Dự án hạn chế CapEx — phần cứng edge mỗi site là chi phí upfront đáng kể
+- Dữ liệu không quan trọng mà đám mây có thể xử lý với chi phí hợp lý
+
+**Phù hợp**: IIoT với yêu cầu an toàn, hệ thống cần hoạt động offline, xử lý video/ảnh, latency < 10ms, chủ quyền dữ liệu (GDPR/HIPAA).
+
+#### Triển khai thực tế đã được công bố
+
+| Tổ chức | Mô tả | Nguồn |
+|---|---|---|
+| **Rolls-Royce** | ECU preprocessing trên 4,500+ động cơ phản lực, MQTT qua vệ tinh đến Azure Databricks | [Microsoft Customer Story](https://www.microsoft.com/en/customers/story/23201-rolls-royce-azure-databricks) · [RTInsights](https://www.rtinsights.com/rolls-royce-jet-engine-maintenance-iot/) |
+| **John Deere** | Edge AI trên 1.5M+ máy nông nghiệp, quyết định gieo hạt từng cây tại edge (<100ms) | [Databricks Blog 2021](https://www.databricks.com/blog/2021/07/09/down-to-the-individual-grain-how-john-deere-uses-industrial-ai-to-increase-crop-yields-through-precision-agriculture.html) · [Harvard D3](https://d3.harvard.edu/platform-digit/submission/farm-to-data-table-john-deere-and-data-in-precision-agriculture/) |
+| **BMW Group** | AWS IoT Greengrass tại 30+ nhà máy toàn cầu, kiểm soát chất lượng bằng computer vision | [AWS Case Study](https://aws.amazon.com/solutions/case-studies/bmw-group-iot/) |
+| **Siemens MindSphere** | MindConnect edge runtime (IoT2050) + cloud analytics, 200+ giao thức công nghiệp | [AWS re:Invent MFG202](https://d1.awsstatic.com/events/reinvent/2019/Building_on_AWS_The_architecture_of_the_Siemens_MindSphere_platform_MFG202.pdf) · [Siemens Whitepaper](https://www.plm.automation.siemens.com/media/global/en/Siemens-MindSphere-Whitepaper-69993_tcm27-29087.pdf) |
+| **GE Predix** | Edge analytics cho 400+ cơ sở sản xuất, Modbus/OPC-UA/DDS qua Predix Machine | [GE Predix Whitepaper](https://ecosystems4innovating.wordpress.com/wp-content/uploads/2016/11/predix-the-platform-for-the-industrial-internet-whitepaper.pdf) · [MIT Sloan Review](https://sloanreview.mit.edu/case-study/ge-big-bet-on-data-and-analytics/) |
+
+#### Nghiên cứu học thuật
+
+> **Peer-reviewed research xác nhận các đánh đổi kiến trúc trên:**
+>
+> - *"Edge Computing and Cloud Computing for Internet of Things: A Review"* — MDPI Machines Journal, 2024. Phân tích toàn diện các đánh đổi latency/scalability/privacy trong kiến trúc hybrid IoT. [mdpi.com/2227-9709/11/4/71](https://www.mdpi.com/2227-9709/11/4/71)
+>
+> - *"Edge Computing for IoT — Comprehensive Survey"* — arXiv, 2024. Khảo sát các mẫu triển khai edge-cloud cho IoT và phân loại workload theo đặc tính thời gian. [arxiv.org/html/2402.13056v1](https://arxiv.org/html/2402.13056v1)
+>
+> - *"On the Edge of the Deployment: A Survey on Multi-access Edge Computing"* — ACM Computing Surveys, 2023. Phân tích chuyên sâu về kiến trúc MEC, service placement, và orchestration. [dl.acm.org/doi/10.1145/3529758](https://dl.acm.org/doi/10.1145/3529758)
+>
+> - *"Integrating IoT and 6G: Applications of Edge Intelligence"* — IEEE Computer Society, 2025. Xu hướng kết hợp edge AI và 6G cho thế hệ IoT tiếp theo. [computer.org](https://www.computer.org/csdl/journal/sc/2025/04/11074426/28eYP7r5TUI)
+
+#### Tài liệu tham khảo
+
+**Tài liệu nhà cung cấp (Vendor Documentation)**
+- AWS — *IoT Greengrass v2 Developer Guide* (2024): https://docs.aws.amazon.com/greengrass/v2/developerguide/
+- AWS — *IoT Greengrass Nucleus Lite for constrained devices* (2024): https://aws.amazon.com/blogs/iot/aws-iot-greengrass-nucleus-lite-revolutionizing-edge-computing-on-resource-constrained-devices/
+- Microsoft — *Azure IoT Edge documentation* (2024): https://learn.microsoft.com/en-us/azure/iot-edge/
+- Microsoft — *Azure IoT Edge Runtime architecture* (2024): https://learn.microsoft.com/en-us/azure/iot-edge/iot-edge-runtime
+- Microsoft — *Azure Industrial IoT / OPC-UA Platform*: https://azure.github.io/Industrial-IoT/
+- Google Cloud — *Distributed Cloud Edge overview* (2024): https://cloud.google.com/distributed-cloud/edge/latest/docs/overview
+- Google Cloud — *Distributed Cloud Edge use cases* (2024): https://cloud.google.com/blog/products/infrastructure-modernization/google-distributed-cloud-edge-appliance-use-cases/
+
+**Mã nguồn mở (Open-Source Frameworks)**
+- KubeEdge — *CNCF Graduated Project* (2024): https://kubeedge.io/ · https://www.cncf.io/projects/kubeedge/
+- LF Edge — *Project EVE Impact Stage* (2024): https://www.linuxfoundation.org/press/project-eve-hits-maturity-within-lf-edge-releases-multi-node-support-for-enhanced-edge-computing-resilience
+- LF Edge — *EdgeX Foundry & all LF Edge projects*: https://lfedge.org/our-projects/
+- Eclipse Foundation — *Eclipse Kura v5.6 Documentation*: https://eclipse-kura.github.io/kura/docs-release-5.6/
+- K3s — *Lightweight Kubernetes for edge*: https://k3s.io/
+
+**Tiêu chuẩn quốc tế (International Standards)**
+- NIST — *SP 800-213: IoT Device Cybersecurity Guidance* (2022): https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-213.pdf
+- ETSI — *GS MEC 003 v3.1.1: MEC Reference Architecture* (2022): https://www.etsi.org/deliver/etsi_gs/MEC/001_099/003/03.01.01_60/gs_mec003v030101p.pdf
+- ETSI — *White Paper #59: Enabling MEC in IoT* (2020): https://www.etsi.org/images/files/ETSIWhitePapers/ETSI-WP59-Enabling-Multi-access-Edge-Computing-in-iot.pdf
+- ETSI — *MEC Technology Page (Phase 4, 2024)*: https://www.etsi.org/technologies/multi-access-edge-computing
+
+**Phần cứng Edge AI**
+- NVIDIA — *Jetson Orin Product Brief*: https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/
+- Google — *Coral Edge TPU*: https://coral.ai/docs/edgetpu/faq/
+
+**Nghiên cứu học thuật (Academic Research)**
+- MDPI Machines Journal — *Edge Computing and Cloud Computing for IoT: A Review* (2024): https://www.mdpi.com/2227-9709/11/4/71
+- arXiv — *Edge Computing for IoT: Comprehensive Survey* (2024): https://arxiv.org/html/2402.13056v1
+- ACM Computing Surveys — *Survey on Multi-access Edge Computing* (2023): https://dl.acm.org/doi/10.1145/3529758
+- IEEE Computer Society — *Integrating IoT and 6G: Edge Intelligence* (2025): https://www.computer.org/csdl/journal/sc/2025/04/11074426/28eYP7r5TUI
+- MDPI — *Integrating MEC into Open 5G Core* (2024): https://www.mdpi.com/2673-4001/5/2/22
+
+**Nghiên cứu tình huống (Industry Case Studies)**
+- Microsoft Customer Story — *Rolls-Royce + Azure Databricks* (2023): https://www.microsoft.com/en/customers/story/23201-rolls-royce-azure-databricks
+- Rolls-Royce — *IntelligentEngine Press Release* (2018): https://www.rolls-royce.com/media/press-releases/2018/06-02-2018-rr-intelligentengine-driven-by-data.aspx
+- Databricks Blog — *John Deere Precision Agriculture* (2021): https://www.databricks.com/blog/2021/07/09/down-to-the-individual-grain-how-john-deere-uses-industrial-ai-to-increase-crop-yields-through-precision-agriculture.html
+- Harvard D3 — *John Deere and Data in Precision Agriculture*: https://d3.harvard.edu/platform-digit/submission/farm-to-data-table-john-deere-and-data-in-precision-agriculture/
+- AWS re:Invent 2019 MFG202 — *Siemens MindSphere on AWS*: https://d1.awsstatic.com/events/reinvent/2019/Building_on_AWS_The_architecture_of_the_Siemens_MindSphere_platform_MFG202.pdf
+- GE Predix Whitepaper — *Platform for the Industrial Internet*: https://ecosystems4innovating.wordpress.com/wp-content/uploads/2016/11/predix-the-platform-for-the-industrial-internet-whitepaper.pdf
 
 ---
 
